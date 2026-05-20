@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cricket Management Pro - Advanced Tournament & Live Scoring</title>
+  <link rel="stylesheet" href="cricket_management_pro.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Three.js for 3D -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Navigation Sidebar -->
+    <aside class="sidebar">
+      <div class="brand-section">
+        <i data-lucide="trophy" class="brand-logo"></i>
+        <span class="brand-name">🏏 Cricket Management Pro</span>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item active" id="nav-dashboard">
+          <a onclick="navigateTo('dashboard')">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item" id="nav-tournaments">
+          <a onclick="navigateTo('tournaments')">
+            <i data-lucide="award"></i>
+            <span>Tournaments</span>
+          </a>
+        </li>
+        <li class="nav-item" id="nav-scorer">
+          <a onclick="navigateTo('scorer')">
+            <i data-lucide="play-circle"></i>
+            <span>Live Scorer</span>
+          </a>
+        </li>
+        <li class="nav-item" id="nav-players">
+          <a onclick="navigateTo('players')">
+            <i data-lucide="users"></i>
+            <span>Players Directory</span>
+          </a>
+        </li>
+        <li class="nav-item" id="nav-history">
+          <a onclick="navigateTo('history')">
+            <i data-lucide="history"></i>
+            <span>Match History</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- ==================== DASHBOARD VIEW ==================== -->
+      <section id="view-dashboard" class="view-section active-view">
+        <div class="glass-card flex-space">
+          <div>
+            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 6px;">Welcome to Cricket Management Pro</h1>
+            <p style="color: var(--text-secondary); font-size: 14px;">Track live scores, manage tournaments, view detailed player profiles and match action logs.</p>
+          </div>
+          <button class="btn btn-accent" onclick="navigateTo('scorer')">
+            <i data-lucide="swords"></i> Start Quick Match
+          </button>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card" onclick="navigateTo('tournaments')">
+            <span class="metric-card-label">Active Tournaments</span>
+            <span class="metric-card-value" id="dash-tourneys-count">0</span>
+          </div>
+          <div class="metric-card" onclick="navigateTo('players')">
+            <span class="metric-card-label">Total Players</span>
+            <span class="metric-card-value" id="dash-players-count">0</span>
+          </div>
+          <div class="metric-card" onclick="navigateTo('history')">
+            <span class="metric-card-label">Matches Scored</span>
+            <span class="metric-card-value" id="dash-matches-count">0</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" class="scorer-layout">
+          <!-- Active / Live Match Banner -->
+          <div class="glass-card" id="dash-active-match-card">
+            <div class="card-title">Live / Active Match</div>
+            <div id="dash-active-match-content">
+              <div class="empty-state">
+                <i data-lucide="help-circle"></i>
+                <p>No active match currently in progress.</p>
+                <button class="btn btn-primary btn-sm" style="margin-top: 12px;" onclick="navigateTo('scorer')">New Scorecard</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Matches Summary -->
+          <div class="glass-card">
+            <div class="card-title">Recent Matches</div>
+            <div id="dash-recent-list" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Inserted via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TOURNAMENTS HUB ==================== -->
+      <section id="view-tournaments" class="view-section">
+        <div class="glass-card flex-space">
+          <div>
+            <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">Tournaments</h1>
+            <p style="color: var(--text-secondary); font-size: 14px;">Organize leagues, track team standings, and review player honors.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openModal('modal-add-tournament')">
+            <i data-lucide="plus-circle"></i> Create Tournament
+          </button>
+        </div>
+
+        <div class="cards-grid" id="tournaments-list">
+          <!-- Inserted via JS -->
+        </div>
+      </section>
+
+      <!-- ==================== TOURNAMENT DETAILS ==================== -->
+      <section id="view-tournament-detail" class="view-section">
+        <div class="glass-card flex-space">
+          <div>
+            <a onclick="navigateTo('tournaments')" style="color: var(--accent); cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
+              <i data-lucide="arrow-left" style="width:14px;height:14px"></i> Back to Tournaments
+            </a>
+            <h1 style="font-size: 26px; font-weight: 800; margin-bottom: 4px;" id="tdetail-name">Tournament Details</h1>
+            <p style="color: var(--text-secondary); font-size: 14px;" id="tdetail-meta">Kotla Ground • League Stage</p>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-secondary btn-sm" onclick="openAddTeamModal()">
+              <i data-lucide="plus"></i> Add Team
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openScheduleMatchModal()">
+              <i data-lucide="calendar"></i> Schedule Match
+            </button>
+          </div>
+        </div>
+
+        <!-- Inner Navigation Tabs for Tournament Details -->
+        <div class="inner-tabs">
+          <button class="inner-tab active" onclick="showTourneySubTab('standings', this)">Standings</button>
+          <button class="inner-tab" onclick="showTourneySubTab('matches', this)">Matches / Fixtures</button>
+          <button class="inner-tab" onclick="showTourneySubTab('teams', this)">Teams & Players</button>
+          <button class="inner-tab" onclick="showTourneySubTab('stats', this)">Leaderboard</button>
+        </div>
+
+        <!-- Standings (Points Table) Sub-view -->
+        <div id="tsub-standings" class="tsub-section" style="display: block;">
+          <div class="glass-card">
+            <div class="card-title">Points Table</div>
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width: 50px;">Pos</th>
+                    <th>Team</th>
+                    <th>P</th>
+                    <th>W</th>
+                    <th>L</th>
+                    <th>T</th>
+                    <th>NR</th>
+                    <th>NRR</th>
+                    <th>Pts</th>
+                  </tr>
+                </thead>
+                <tbody id="tdetail-standings-tbody">
+                  <!-- JS calculated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Matches & Fixtures Sub-view -->
+        <div id="tsub-matches" class="tsub-section" style="display: none;">
+          <div class="cards-grid" id="tdetail-matches-list">
+            <!-- Scheduled and finished matches -->
+          </div>
+        </div>
+
+        <!-- Teams & Rosters Sub-view -->
+        <div id="tsub-teams" class="tsub-section" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px;" class="scorer-layout">
+            <div class="glass-card">
+              <div class="card-title">Teams List</div>
+              <ul class="nav-list" id="tdetail-teams-ul" style="gap: 4px;">
+                <!-- Roster teams selection -->
+              </ul>
+            </div>
+            <div class="glass-card">
+              <div class="card-header-row">
+                <div class="card-title" id="tdetail-team-roster-title">Roster</div>
+                <button class="btn btn-primary btn-sm" id="tdetail-btn-add-roster-player" onclick="openAddPlayerModal()" style="display:none">
+                  <i data-lucide="plus"></i> Add Player
+                </button>
+              </div>
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Player Name</th>
+                      <th>Role</th>
+                      <th>Batting</th>
+                      <th>Bowling</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tdetail-roster-tbody">
+                    <tr><td colspan="4" class="empty-state">Select a team to view player roster.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tournament Leaderboard Stats -->
+        <div id="tsub-stats" class="tsub-section" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" class="scorer-layout">
+            <!-- Batting leaders -->
+            <div class="glass-card">
+              <div class="card-title" style="color: var(--warning)">🏏 Top Run Scorers (Orange Cap)</div>
+              <div class="table-container" style="margin-top: 12px;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Player</th>
+                      <th>Team</th>
+                      <th>Runs</th>
+                      <th>SR</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tdetail-batting-leaders">
+                    <!-- JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Bowling leaders -->
+            <div class="glass-card">
+              <div class="card-title" style="color: hsl(270, 70%, 65%)">🎯 Most Wickets (Purple Cap)</div>
+              <div class="table-container" style="margin-top: 12px;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Player</th>
+                      <th>Team</th>
+                      <th>Wkts</th>
+                      <th>Econ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tdetail-bowling-leaders">
+                    <!-- JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== LIVE SCORER VIEW ==================== -->
+      <section id="view-scorer" class="view-section">
+        
+        <!-- Scorer Setup Panel -->
+        <div id="scorer-setup" class="glass-card" style="max-width: 600px; margin: 0 auto;">
+          <div class="card-title" style="font-size: 16px;">Setup New Match</div>
+          
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label>Match Type</label>
+            <select id="score-match-type" onchange="toggleSetupMatchSelects()">
+              <option value="casual">Casual Match (Friendly)</option>
+              <option value="tournament">Tournament Match</option>
+            </select>
+          </div>
+
+          <!-- Tournament selection fields -->
+          <div id="setup-tournament-fields" style="display: none; border-left: 2px solid var(--accent); padding-left: 14px; margin-bottom: 16px;">
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label>Select Tournament</label>
+              <select id="score-tourney-select" onchange="loadTournamentMatchOptions()"></select>
+            </div>
+            <div class="form-group">
+              <label>Select Scheduled Match</label>
+              <select id="score-scheduled-match-select" onchange="loadScheduledMatchDetails()"></select>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Team A (Batting/Fielding)</label>
+              <input id="score-teamA-name" placeholder="e.g. Kotla Kings">
+            </div>
+            <div class="form-group">
+              <label>Team B (Batting/Fielding)</label>
+              <input id="score-teamB-name" placeholder="e.g. Alamgir Aces">
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Toss Won By</label>
+              <select id="score-toss-winner">
+                <option value="A">Team A</option>
+                <option value="B">Team B</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Elected To</label>
+              <select id="score-toss-elect">
+                <option value="bat">Bat</option>
+                <option value="field">Field</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 20px;">
+            <label>Overs Per Innings</label>
+            <select id="score-overs-select">
+              <option value="1">1 Over</option>
+              <option value="2">2 Overs</option>
+              <option value="4">4 Overs</option>
+              <option value="6">6 Overs</option>
+              <option value="8">8 Overs</option>
+              <option value="12" selected>12 Overs</option>
+              <option value="20">20 Overs</option>
+            </select>
+          </div>
+
+          <!-- Roster input areas -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+            <div>
+              <label style="margin-bottom: 8px;">Team A Players</label>
+              <div id="scorer-players-list-A" style="display: flex; flex-direction: column; gap: 6px;"></div>
+              <button class="btn btn-secondary btn-sm" onclick="addScorerPlayerInput('A')" style="margin-top: 8px; width: 100%;">+ Player</button>
+            </div>
+            <div>
+              <label style="margin-bottom: 8px;">Team B Players</label>
+              <div id="scorer-players-list-B" style="display: flex; flex-direction: column; gap: 6px;"></div>
+              <button class="btn btn-secondary btn-sm" onclick="addScorerPlayerInput('B')" style="margin-top: 8px; width: 100%;">+ Player</button>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="launchScorecard()" style="width: 100%; font-size: 16px;">
+            <i data-lucide="play"></i> Start Match
+          </button>
+        </div>
+
+        <!-- Active Scoring Dashboard (Hidden until match starts) -->
+        <div id="scorer-active" style="display: none;" class="scorer-layout">
+          
+          <!-- Left Main Panel: Game Tracker -->
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- LIVE STREAM SECTION -->
+            <div class="glass-card live-stream-container">
+              <div class="card-header-row">
+                <div class="card-title">🎥 Live Broadcast</div>
+                <button class="btn btn-secondary btn-sm" onclick="open3DFieldModal()">
+                  <i data-lucide="cube"></i> 3D Field
+                </button>
+              </div>
+              <div class="live-stream-wrapper">
+                <div class="video-container" id="live-stream-video">
+                  <div class="broadcast-placeholder">
+                    <i data-lucide="video" style="width: 48px; height: 48px; opacity: 0.5;"></i>
+                    <p>Live Stream Feed</p>
+                    <div class="live-indicator">
+                      <span class="live-dot"></span>
+                      <span>LIVE</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="stream-controls">
+                  <input type="text" id="stream-url-input" placeholder="Enter YouTube/RTMP URL..." class="stream-url-input">
+                  <button class="btn btn-primary btn-sm" onclick="loadStreamURL()">Load Stream</button>
+                  <button class="btn btn-secondary btn-sm" onclick="toggleSimulatedBroadcast()">Simulated Feed</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live score card banner -->
+            <div class="glass-card" style="background: linear-gradient(135deg, hsl(223, 47%, 18%), var(--bg-secondary)); border-color: rgba(108, 93, 211, 0.3);">
+              <div class="flex-space" style="margin-bottom: 12px;">
+                <span id="score-live-team-label" style="font-weight: 800; font-size: 20px; color: var(--accent);">Kotla Kings Batting</span>
+                <span id="score-live-target-badge" class="cap-badge cap-orange" style="display: none;">Target: --</span>
+              </div>
+              <div class="flex-space" style="align-items: baseline;">
+                <span style="font-size: 54px; font-weight: 800; font-family: 'JetBrains Mono', monospace;" id="score-live-total">0/0</span>
+                <div style="text-align: right;">
+                  <div style="font-size: 22px; font-weight: 700; color: var(--text-primary);" id="score-live-overs">0.0 Overs</div>
+                  <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">Run Rate: <span id="score-live-rr" style="font-weight:700">0.00</span></div>
+                </div>
+              </div>
+              <div id="score-live-need-runrate" style="margin-top: 14px; font-size: 13px; color: var(--warning); font-weight: 700; display: none;">
+                Need 82 runs in 12.0 overs (Req. RR: 6.83)
+              </div>
+            </div>
+
+            <!-- Crease Info -->
+            <div class="glass-card">
+              <div class="card-title">Crease Details</div>
+              <div class="table-container">
+                <table class="crease-table">
+                  <thead>
+                    <tr>
+                      <th>Batsman</th>
+                      <th>Runs</th>
+                      <th>Balls</th>
+                      <th>4s</th>
+                      <th>6s</th>
+                      <th>SR</th>
+                    </tr>
+                  </thead>
+                  <tbody id="score-crease-tbody">
+                    <!-- Striker and non-striker -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Scoring Action Grid -->
+            <div class="glass-card">
+              <div class="card-title">Ball Action</div>
+              
+              <div class="player-select" style="margin-bottom: 16px;">
+                <div>
+                  <label>Current Striker</label>
+                  <select id="score-striker-select" onchange="changeCreaseStriker()"></select>
+                </div>
+                <div>
+                  <label>Current Bowler</label>
+                  <select id="score-bowler-select"></select>
+                </div>
+              </div>
+
+              <div class="ball-input-area">
+                <div>
+                  <label style="margin-bottom: 8px; display: block;">Runs (Click to score)</label>
+                  <div class="runs-selector">
+                    <button class="runs-btn" onclick="scoreBall(0)">0</button>
+                    <button class="runs-btn" onclick="scoreBall(1)">1</button>
+                    <button class="runs-btn" onclick="scoreBall(2)">2</button>
+                    <button class="runs-btn" onclick="scoreBall(3)">3</button>
+                    <button class="runs-btn b4" onclick="scoreBall(4)">4</button>
+                    <button class="runs-btn" onclick="scoreBall(5)">5</button>
+                    <button class="runs-btn b6" onclick="scoreBall(6)">6</button>
+                    <button class="runs-btn bw" onclick="triggerWicketModal()">W</button>
+                  </div>
+                </div>
+
+                <div class="sep"></div>
+
+                <div>
+                  <label style="margin-bottom: 8px; display: block;">Extras</label>
+                  <div class="extras-grid">
+                    <div class="extra-box">
+                      <span>Wide</span>
+                      <select id="score-wide-runs"><option value="1">+1</option><option value="2">+2</option><option value="3">+3</option><option value="4">+4</option></select>
+                      <button class="btn btn-secondary btn-sm" onclick="scoreExtra('Wide')">Add</button>
+                    </div>
+                    <div class="extra-box">
+                      <span>No Ball</span>
+                      <select id="score-noball-runs"><option value="1">+1</option><option value="2">+2</option><option value="3">+3</option><option value="4">+4</option></select>
+                      <button class="btn btn-secondary btn-sm" onclick="scoreExtra('NoBall')">Add</button>
+                    </div>
+                    <div class="extra-box">
+                      <span>Byes</span>
+                      <select id="score-byes-runs"><option value="1">+1</option><option value="2">+2</option><option value="3">+3</option><option value="4">+4</option></select>
+                      <button class="btn btn-secondary btn-sm" onclick="scoreExtra('Bye')">Add</button>
+                    </div>
+                    <div class="extra-box">
+                      <span>Leg Byes</span>
+                      <select id="score-legbyes-runs"><option value="1">+1</option><option value="2">+2</option><option value="3">+3</option><option value="4">+4</option></select>
+                      <button class="btn btn-secondary btn-sm" onclick="scoreExtra('LegBye')">Add</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-top: 8px;">
+                  <button class="btn btn-secondary" onclick="undoScoreAction()">
+                    <i data-lucide="undo-2"></i> Undo
+                  </button>
+                  <button class="btn btn-danger" onclick="confirmEndInnings()">
+                    <i data-lucide="octagon"></i> Force End Innings
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Detailed Match Scorecard Sub-tabs -->
+            <div class="glass-card">
+              <div class="inner-tabs">
+                <button class="inner-tab active" onclick="showScorecardSubTab('batting', this)">Batting</button>
+                <button class="inner-tab" onclick="showScorecardSubTab('bowling', this)">Bowling</button>
+                <button class="inner-tab" onclick="showScorecardSubTab('fow', this)">Fall of Wkts</button>
+                <button class="inner-tab" onclick="showScorecardSubTab('overs', this)">Overs List</button>
+              </div>
+
+              <!-- Batting card -->
+              <div id="ssub-batting" class="ssub-section" style="display: block;">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Batsman</th>
+                        <th>Dismissal</th>
+                        <th>Runs</th>
+                        <th>Balls</th>
+                        <th>4s</th>
+                        <th>6s</th>
+                        <th>SR</th>
+                      </tr>
+                    </thead>
+                    <tbody id="score-full-bat-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Bowling card -->
+              <div id="ssub-bowling" class="ssub-section" style="display: none;">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Bowler</th>
+                        <th>Overs</th>
+                        <th>Maidens</th>
+                        <th>Runs</th>
+                        <th>Wickets</th>
+                        <th>Econ</th>
+                      </tr>
+                    </thead>
+                    <tbody id="score-full-bowl-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Fall of Wickets -->
+              <div id="ssub-fow" class="ssub-section" style="display: none;">
+                <div class="fow-list" id="score-full-fow-list">
+                  <p class="empty-state">No wickets have fallen in this innings.</p>
+                </div>
+              </div>
+
+              <!-- Overs Log -->
+              <div id="ssub-overs" class="ssub-section" style="display: none;">
+                <div class="overs-scroller" id="score-full-overs-log">
+                  <p class="empty-state">No completed overs.</p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- Right Sidebar Panel: Current Over Balls & Commentary -->
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- Current Over Balls Bubble Row -->
+            <div class="glass-card">
+              <div class="card-title">Current Over</div>
+              <div class="over-balls-row" id="score-current-over-balls">
+                <span style="font-size: 13px; color: var(--text-muted)">Waiting for bowler...</span>
+              </div>
+            </div>
+
+            <!-- Live Action Ball Commentary Log -->
+            <div class="glass-card" style="flex: 1; display: flex; flex-direction: column; gap: 14px;">
+              <div class="card-title">Live Action Log</div>
+              <div class="action-timeline" id="score-commentary-timeline">
+                <div class="timeline-item"><div class="timeline-desc">Match setup completed. Awaiting first delivery.</div></div>
+              </div>
+            </div>
+            
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ==================== PLAYERS DIRECTORY VIEW ==================== -->
+      <section id="view-players" class="view-section">
+        <div class="glass-card flex-space">
+          <div>
+            <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">Player Profiles</h1>
+            <p style="color: var(--text-secondary); font-size: 14px;">Browse player bios, performance records, and career achievements.</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddPlayerModalGlobal()">
+            <i data-lucide="user-plus"></i> Add Player
+          </button>
+        </div>
+
+        <div class="search-container">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="player-search-bar" class="search-input" placeholder="Search players by name or team..." onkeyup="filterPlayersDirectory()">
+        </div>
+
+        <!-- Team-grouped Player Roster -->
+        <div id="players-grouped-container" style="display: flex; flex-direction: column; gap: 20px;">
+          <!-- Teams and their players will be inserted here -->
+        </div>
+
+        <!-- Fallback: Full Players Table -->
+        <div class="glass-card" id="players-table-fallback">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width: 50px;">Photo</th>
+                  <th>Player Name</th>
+                  <th>Primary Team</th>
+                  <th>Role</th>
+                  <th>Matches</th>
+                  <th>Runs</th>
+                  <th>Wkts</th>
+                  <th>Bat Avg</th>
+                  <th>Bowl Econ</th>
+                </tr>
+              </thead>
+              <tbody id="players-directory-tbody">
+                <!-- Filled via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== MATCH HISTORY VIEW ==================== -->
+      <section id="view-history" class="view-section">
+        <div class="glass-card">
+          <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">Match History</h1>
+          <p style="color: var(--text-secondary); font-size: 14px;">Review match outcomes, detailed scores, and ball-by-ball replayable logs.</p>
+        </div>
+
+        <div class="cards-grid" id="history-match-list">
+          <!-- Inserted via JS -->
+        </div>
+      </section>
+
+      <!-- ==================== MATCH CENTER VIEW (SINGLE MATCH DETAILS) ==================== -->
+      <section id="view-match-center" class="view-section">
+        <div class="glass-card flex-space">
+          <div>
+            <a onclick="navigateTo('history')" style="color: var(--accent); cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; margin-bottom: 8px;">
+              <i data-lucide="arrow-left" style="width:14px;height:14px"></i> Back to History
+            </a>
+            <h1 style="font-size: 26px; font-weight: 800; margin-bottom: 4px;" id="mc-title">Team A vs Team B</h1>
+            <p style="color: var(--text-secondary); font-size: 14px;" id="mc-meta">Match Date • Tournament Name</p>
+          </div>
+          <div id="mc-result-badge" class="card-badge status-completed">Completed</div>
+        </div>
+
+        <div class="glass-card" style="background-color: var(--primary-glow); border-color: rgba(108, 93, 211, 0.3);">
+          <div style="font-size: 16px; font-weight: 700; text-align: center; color: var(--text-primary);" id="mc-result-text">
+            Kotla Kings won by 24 runs
+          </div>
+        </div>
+
+        <!-- Scores overview grid -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-card-label" id="mc-team1-name">Kotla Kings</span>
+            <span class="metric-card-value" id="mc-team1-score">124/4 (12.0)</span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-card-label" id="mc-team2-name">Alamgir Aces</span>
+            <span class="metric-card-value" id="mc-team2-score">100/6 (12.0)</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 24px;" class="scorer-layout">
+          
+          <!-- Scorecards -->
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- Innings 1 Accordion Card -->
+            <div class="glass-card">
+              <div class="card-title" id="mc-inn1-title">Kotla Kings scorecard</div>
+              <div class="inner-tabs" style="margin-top: 14px;">
+                <button class="inner-tab active" onclick="showMatchCenterTab('inn1-batting', this)">Batting</button>
+                <button class="inner-tab" onclick="showMatchCenterTab('inn1-bowling', this)">Bowling</button>
+                <button class="inner-tab" onclick="showMatchCenterTab('inn1-fow', this)">Fall of Wkts</button>
+              </div>
+
+              <div id="mc-inn1-batting" class="mc-tab-section" style="display: block;">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>
+                    </thead>
+                    <tbody id="mc-inn1-bat-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div id="mc-inn1-bowling" class="mc-tab-section" style="display: none;">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Econ</th></tr>
+                    </thead>
+                    <tbody id="mc-inn1-bowl-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div id="mc-inn1-fow" class="mc-tab-section" style="display: none;">
+                <div class="fow-list" id="mc-inn1-fow-list"></div>
+              </div>
+            </div>
+
+            <!-- Innings 2 Accordion Card -->
+            <div class="glass-card" id="mc-inn2-card" style="display: none;">
+              <div class="card-title" id="mc-inn2-title">Alamgir Aces scorecard</div>
+              <div class="inner-tabs" style="margin-top: 14px;">
+                <button class="inner-tab active" onclick="showMatchCenterTab('inn2-batting', this)">Batting</button>
+                <button class="inner-tab" onclick="showMatchCenterTab('inn2-bowling', this)">Bowling</button>
+                <button class="inner-tab" onclick="showMatchCenterTab('inn2-fow', this)">Fall of Wkts</button>
+              </div>
+
+              <div id="mc-inn2-batting" class="mc-tab-section" style="display: block;">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr><th>Batsman</th><th>Dismissal</th><th>R</th><th>B</th><th>4s</th><th>6s</th><th>SR</th></tr>
+                    </thead>
+                    <tbody id="mc-inn2-bat-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div id="mc-inn2-bowling" class="mc-tab-section" style="display: none;">
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr><th>Bowler</th><th>O</th><th>M</th><th>R</th><th>W</th><th>Econ</th></tr>
+                    </thead>
+                    <tbody id="mc-inn2-bowl-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div id="mc-inn2-fow" class="mc-tab-section" style="display: none;">
+                <div class="fow-list" id="mc-inn2-fow-list"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Commentary Action Log Replay -->
+          <div class="glass-card" style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="card-title">Ball Commentary Log</div>
+            <!-- Commentary Selection dropdown (Innings selector) -->
+            <select id="mc-commentary-inn-select" onchange="renderMatchCenterCommentary()" style="margin-bottom: 4px;">
+              <option value="1">1st Innings Commentary</option>
+              <option value="2">2nd Innings Commentary</option>
+            </select>
+            <div class="action-timeline" id="mc-commentary-timeline" style="max-height: 500px;">
+              <!-- Commentary events list -->
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- ==================== MODALS & OVERLAYS ==================== -->
+
+  <!-- Add Tournament Modal -->
+  <div id="modal-add-tournament" class="overlay-modal">
+    <div class="modal-content-card">
+      <button class="modal-close-btn" onclick="closeModal('modal-add-tournament')">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="card-title" style="margin-bottom: 24px; font-size: 16px;">Create New Tournament</div>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label>Tournament Name</label>
+        <input type="text" id="add-t-name" placeholder="e.g. KJCA Premier League 2026">
+      </div>
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label>Venue / Location</label>
+        <input type="text" id="add-t-venue" placeholder="e.g. Kotla Ground, Lahore">
+      </div>
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label>Standard Overs</label>
+        <select id="add-t-overs">
+          <option value="4">4 Overs</option>
+          <option value="6">6 Overs</option>
+          <option value="8">8 Overs</option>
+          <option value="12" selected>12 Overs</option>
+          <option value="20">20 Overs</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="saveNewTournament()" style="width: 100%;">Create League</button>
+    </div>
+  </div>
+
+  <!-- Add Team to Tournament Modal -->
+  <div id="modal-add-team" class="overlay-modal">
+    <div class="modal-content-card">
+      <button class="modal-close-btn" onclick="closeModal('modal-add-team')">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="card-title" style="margin-bottom: 24px; font-size: 16px;">Add Team to Tournament</div>
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label>Team Name</label>
+        <input type="text" id="add-team-name" placeholder="e.g. Kotla Kings">
+      </div>
+      <button class="btn btn-primary" onclick="saveNewTeam()" style="width: 100%;">Save Team</button>
+    </div>
+  </div>
+
+  <!-- Add Player to Team Modal -->
+  <div id="modal-add-player" class="overlay-modal">
+    <div class="modal-content-card">
+      <button class="modal-close-btn" onclick="closeModal('modal-add-player')">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="card-title" style="margin-bottom: 24px; font-size: 16px;">Register New Player</div>
+      
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label>Player Name</label>
+        <input type="text" id="add-p-name" placeholder="Full name">
+      </div>
+
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label>📸 Player Photo</label>
+        <div class="photo-upload-container">
+          <input type="file" id="add-p-photo" accept="image/*" onchange="previewPlayerPhoto()" style="display: none;">
+          <div class="photo-preview" id="photo-preview-box" onclick="document.getElementById('add-p-photo').click()">
+            <i data-lucide="camera" style="width: 32px; height: 32px; opacity: 0.5;"></i>
+            <p>Click to upload photo</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-grid" style="margin-bottom: 16px;">
+        <div class="form-group">
+          <label>Playing Role</label>
+          <select id="add-p-role">
+            <option value="Batsman">Batsman</option>
+            <option value="Bowler">Bowler</option>
+            <option value="All-Rounder">All-Rounder</option>
+            <option value="Wicketkeeper-Batsman">Wicketkeeper-Batsman</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Batting Style</label>
+          <select id="add-p-batting">
+            <option value="Right-Hand Bat">Right-Hand Bat</option>
+            <option value="Left-Hand Bat">Left-Hand Bat</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label>Bowling Style</label>
+        <select id="add-p-bowling">
+          <option value="None">None</option>
+          <option value="Right-Arm Fast">Right-Arm Fast</option>
+          <option value="Right-Arm Medium">Right-Arm Medium</option>
+          <option value="Right-Arm Spin">Right-Arm Off Spin</option>
+          <option value="Leg Spin">Leg Spin</option>
+          <option value="Left-Arm Fast">Left-Arm Fast</option>
+          <option value="Left-Arm Spin">Left-Arm Orthodox Spin</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label>Biography / Notes</label>
+        <textarea id="add-p-bio" rows="3" placeholder="Brief details about the player..."></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="saveNewPlayer()" style="width: 100%;">Register Player</button>
+    </div>
+  </div>
+
+  <!-- Schedule Match Modal -->
+  <div id="modal-schedule-match" class="overlay-modal">
+    <div class="modal-content-card">
+      <button class="modal-close-btn" onclick="closeModal('modal-schedule-match')">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="card-title" style="margin-bottom: 24px; font-size: 16px;">Schedule Tournament Match</div>
+      
+      <div class="form-grid" style="margin-bottom: 24px;">
+        <div class="form-group">
+          <label>Team A</label>
+          <select id="schedule-teamA-select"></select>
+        </div>
+        <div class="form-group">
+          <label>Team B</label>
+          <select id="schedule-teamB-select"></select>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="saveScheduledMatch()" style="width: 100%;">Schedule Fixture</button>
+    </div>
+  </div>
+
+  <!-- Wicket Input Modal -->
+  <div id="modal-wicket-details" class="overlay-modal" style="background-color: rgba(10, 12, 22, 0.9);">
+    <div class="modal-content-card" style="max-width: 480px; margin-top: 10vh;">
+      <button class="modal-close-btn" onclick="closeModal('modal-wicket-details')">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="card-title" style="margin-bottom: 20px; font-size: 16px; color: var(--danger);">Record Dismissal</div>
+      
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label>Batsman Out</label>
+        <select id="wkt-batsman-out-select"></select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label>Dismissal Type</label>
+        <select id="wkt-dismissal-type-select" onchange="toggleWktFielderField()">
+          <option value="Bowled">Bowled</option>
+          <option value="Caught">Caught</option>
+          <option value="LBW">LBW</option>
+          <option value="Run Out">Run Out</option>
+          <option value="Stumped">Stumped</option>
+          <option value="Hit Wicket">Hit Wicket</option>
+          <option value="Obstructing the Field">Obstructing the Field</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 20px; display: none;" id="wkt-fielder-div">
+        <label id="wkt-fielder-label">Fielder</label>
+        <select id="wkt-fielder-select"></select>
+      </div>
+
+      <button class="btn btn-danger" onclick="saveWicketAction()" style="width: 100%;">Confirm Wicket</button>
+    </div>
+  </div>
+
+  <!-- Player Profile Overlay Modal -->
+  <div id="modal-player-profile" class="overlay-modal">
+    <div class="modal-content-card">
+      <button class="modal-close-btn" onclick="closeModal('modal-player-profile')">
+        <i data-lucide="x"></i>
+      </button>
+      
+      <!-- Hero Header -->
+      <div class="profile-hero">
+        <div class="profile-avatar" id="prof-modal-avatar">--</div>
+        <div class="profile-details">
+          <h2 class="profile-name" id="prof-modal-name">Player Name</h2>
+          <div class="profile-meta-row">
+            <span class="role-badge" id="prof-modal-team">Team Name</span>
+            <span class="role-badge" id="prof-modal-role">Batsman</span>
+            <span class="role-badge" id="prof-modal-style">Right-Hand Bat / Spin</span>
+          </div>
+          <p class="profile-bio" id="prof-modal-bio">No bio available for this player.</p>
+        </div>
+      </div>
+
+      <!-- Scope Filter (Tournament Selector) -->
+      <div class="form-group" style="margin-bottom: 24px; max-width: 280px;">
+        <label>Filter Statistics by Tournament</label>
+        <select id="prof-modal-tourney-filter" onchange="renderProfileStatsFiltered()"></select>
+      </div>
+
+      <!-- Batting Metrics -->
+      <div class="card-title" style="margin-bottom: 14px;">Batting Records</div>
+      <div class="metrics-grid" style="margin-bottom: 12px;">
+        <div class="metric-card">
+          <span class="metric-card-label">Matches</span>
+          <span class="metric-card-value" id="prof-modal-bat-mat">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card-label">Runs</span>
+          <span class="metric-card-value" id="prof-modal-bat-runs">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card-label">Avg / SR</span>
+          <span class="metric-card-value" id="prof-modal-bat-avg-sr">0.0 / 0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card-label">High Score</span>
+          <span class="metric-card-value" id="prof-modal-bat-hs">0</span>
+        </div>
+      </div>
+      <div id="prof-modal-milestones-row" style="margin-bottom: 28px; display: flex; flex-wrap: wrap; gap: 6px;">
+        <!-- Badge highlights -->
+      </div>
+
+      <!-- Bowling Metrics -->
+      <div class="card-title" style="margin-bottom: 14px;">Bowling Records</div>
+      <div class="metrics-grid" style="margin-bottom: 20px;">
+        <div class="metric-card">
+          <span class="metric-card-label">Wickets</span>
+          <span class="metric-card-value" id="prof-modal-bowl-wkts">0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card-label">Best Bowling</span>
+          <span class="metric-card-value" id="prof-modal-bowl-best">0/0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card-label">Econ / Avg</span>
+          <span class="metric-card-value" id="prof-modal-bowl-econ-avg">0.0 / 0.0</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card-label">Overs Bowled</span>
+          <span class="metric-card-value" id="prof-modal-bowl-overs">0.0</span>
+        </div>
+      </div>
+
+      <!-- Bowling stat visualization -->
+      <div id="prof-modal-bowl-visual-chart" style="margin-bottom: 28px; background-color: rgba(255,255,255,0.01); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color)">
+        <!-- Dynamic bars -->
+      </div>
+
+      <!-- Recent Innings Log -->
+      <div class="card-title" style="margin-bottom: 14px;">Recent Performances</div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Opponent / Match</th>
+              <th>Batting</th>
+              <th>Bowling</th>
+            </tr>
+          </thead>
+          <tbody id="prof-modal-recent-tbody">
+            <!-- JS -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 3D Cricket Field Visualization Modal -->
+  <div id="modal-3d-field" class="overlay-modal">
+    <div class="modal-content-card" style="max-width: 900px; max-height: 85vh;">
+      <button class="modal-close-btn" onclick="closeModal('modal-3d-field')">
+        <i data-lucide="x"></i>
+      </button>
+      <div class="card-title" style="margin-bottom: 16px; font-size: 16px;">🎮 3D Cricket Field Visualization</div>
+      <div id="3d-field-container" style="width: 100%; height: 500px; background: linear-gradient(135deg, rgba(108, 93, 211, 0.1), rgba(255, 107, 107, 0.05)); border-radius: var(--radius-md); border: 1px solid var(--border-color); position: relative;">
+        <!-- Three.js 3D field will render here -->
+      </div>
+      <div style="margin-top: 16px; display: flex; gap: 8px;">
+        <button class="btn btn-secondary btn-sm" onclick="rotate3DField('left')">
+          <i data-lucide="rotate-ccw"></i> Rotate Left
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="rotate3DField('right')">
+          <i data-lucide="rotate-cw"></i> Rotate Right
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="zoom3DField('in')">
+          <i data-lucide="zoom-in"></i> Zoom In
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="zoom3DField('out')">
+          <i data-lucide="zoom-out"></i> Zoom Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script Loader -->
+  <script src="cricket_management_pro.js"></script>
+</body>
+</html>
