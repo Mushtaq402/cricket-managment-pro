@@ -1063,3 +1063,308 @@ function renderMatchCenterCommentary() {
 window.addEventListener('load', () => {
   lucide.createIcons();
 });
+
+
+// ============ 3D CRICKET FIELD VISUALIZATION ============
+let scene, camera, renderer, fieldGroup;
+let fieldRotation = 0;
+let fieldZoom = 1;
+
+function init3DField() {
+  const container = document.getElementById('3d-field-container');
+  if (!container || container.querySelector('canvas')) return;
+  
+  // Scene setup
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0f1419);
+  
+  // Camera setup
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.set(0, 15, 20);
+  camera.lookAt(0, 0, 0);
+  
+  // Renderer setup
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setSize(width, height);
+  renderer.shadowMap.enabled = true;
+  container.appendChild(renderer.domElement);
+  
+  // Lighting
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  scene.add(ambientLight);
+  
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  directionalLight.position.set(10, 20, 10);
+  directionalLight.castShadow = true;
+  directionalLight.shadow.mapSize.width = 2048;
+  directionalLight.shadow.mapSize.height = 2048;
+  scene.add(directionalLight);
+  
+  // Create field group
+  fieldGroup = new THREE.Group();
+  scene.add(fieldGroup);
+  
+  // Create cricket field
+  createCricketField();
+  
+  // Animation loop
+  function animate() {
+    requestAnimationFrame(animate);
+    fieldGroup.rotation.y = fieldRotation;
+    renderer.render(scene, camera);
+  }
+  animate();
+  
+  // Handle window resize
+  window.addEventListener('resize', () => {
+    const newWidth = container.clientWidth;
+    const newHeight = container.clientHeight;
+    camera.aspect = newWidth / newHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(newWidth, newHeight);
+  });
+}
+
+function createCricketField() {
+  // Ground
+  const groundGeometry = new THREE.CircleGeometry(30, 64);
+  const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x2d5016 });
+  const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+  fieldGroup.add(ground);
+  
+  // Boundary circle
+  const boundaryGeometry = new THREE.BufferGeometry();
+  const boundaryPoints = [];
+  for (let i = 0; i <= 64; i++) {
+    const angle = (i / 64) * Math.PI * 2;
+    boundaryPoints.push(
+      Math.cos(angle) * 30,
+      0.1,
+      Math.sin(angle) * 30
+    );
+  }
+  boundaryGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(boundaryPoints), 3));
+  const boundaryMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+  const boundary = new THREE.Line(boundaryGeometry, boundaryMaterial);
+  fieldGroup.add(boundary);
+  
+  // Pitch
+  const pitchGeometry = new THREE.PlaneGeometry(22, 3);
+  const pitchMaterial = new THREE.MeshLambertMaterial({ color: 0x3d6b1f });
+  const pitch = new THREE.Mesh(pitchGeometry, pitchMaterial);
+  pitch.rotation.x = -Math.PI / 2;
+  pitch.position.y = 0.05;
+  pitch.castShadow = true;
+  pitch.receiveShadow = true;
+  fieldGroup.add(pitch);
+  
+  // Stumps (Wickets)
+  createWickets(11, 0, 0);
+  createWickets(-11, 0, 0);
+  
+  // Crease lines
+  const creaseGeometry = new THREE.BufferGeometry();
+  const creasePoints = [
+    -1.5, 0.1, -11,
+    1.5, 0.1, -11,
+    1.5, 0.1, 11,
+    -1.5, 0.1, 11
+  ];
+  creaseGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(creasePoints), 3));
+  const creaseMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+  const crease = new THREE.LineSegments(creaseGeometry, creaseMaterial);
+  fieldGroup.add(crease);
+  
+  // Fielding positions (dots)
+  const fielderPositions = [
+    { x: 0, z: -20, label: 'Bowler' },
+    { x: 0, z: 20, label: 'Batsman' },
+    { x: -15, z: -5, label: 'Slip' },
+    { x: 15, z: -5, label: 'Slip' },
+    { x: -20, z: 0, label: 'Square Leg' },
+    { x: 20, z: 0, label: 'Cover' },
+    { x: -10, z: 15, label: 'Mid-Wicket' },
+    { x: 10, z: 15, label: 'Mid-Off' }
+  ];
+  
+  fielderPositions.forEach(pos => {
+    const dotGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+    const dotMaterial = new THREE.MeshLambertMaterial({ color: 0xff6b6b });
+    const dot = new THREE.Mesh(dotGeometry, dotMaterial);
+    dot.position.set(pos.x, 0.3, pos.z);
+    dot.castShadow = true;
+    fieldGroup.add(dot);
+  });
+}
+
+function createWickets(x, y, z) {
+  // Stumps
+  for (let i = 0; i < 3; i++) {
+    const stumpGeometry = new THREE.CylinderGeometry(0.15, 0.15, 2.5, 8);
+    const stumpMaterial = new THREE.MeshLambertMaterial({ color: 0xffd700 });
+    const stump = new THREE.Mesh(stumpGeometry, stumpMaterial);
+    stump.position.set(x + (i - 1) * 0.4, 1.25, z);
+    stump.castShadow = true;
+    fieldGroup.add(stump);
+  }
+  
+  // Bails
+  const bailGeometry = new THREE.BoxGeometry(1.2, 0.1, 0.1);
+  const bailMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const bail = new THREE.Mesh(bailGeometry, bailMaterial);
+  bail.position.set(x, 2.6, z);
+  bail.castShadow = true;
+  fieldGroup.add(bail);
+}
+
+function rotate3DField(direction) {
+  const rotationSpeed = 0.3;
+  if (direction === 'left') {
+    fieldRotation -= rotationSpeed;
+  } else if (direction === 'right') {
+    fieldRotation += rotationSpeed;
+  }
+}
+
+function zoom3DField(direction) {
+  const zoomSpeed = 0.5;
+  if (direction === 'in') {
+    camera.position.z -= zoomSpeed;
+    camera.position.y -= zoomSpeed * 0.5;
+  } else if (direction === 'out') {
+    camera.position.z += zoomSpeed;
+    camera.position.y += zoomSpeed * 0.5;
+  }
+}
+
+// ============ ENHANCED MODAL FUNCTIONS ============
+function openAddTournamentModal() {
+  document.getElementById('add-t-name').value = '';
+  document.getElementById('add-t-venue').value = '';
+  openModal('modal-add-tournament');
+}
+
+function open3DFieldModal() {
+  openModal('modal-3d-field');
+  setTimeout(() => {
+    init3DField();
+  }, 100);
+}
+
+// ============ ENHANCED PLAYER PROFILE MODAL ============
+function enhancePlayerProfileModal(playerId) {
+  const players = loadPlayers();
+  const player = players.find(p => p.id === playerId);
+  if (!player) return;
+  
+  // Populate tournament filter
+  const tournaments = loadTournaments();
+  const filterSelect = document.getElementById('prof-modal-tourney-filter');
+  filterSelect.innerHTML = '<option value="">All Tournaments</option>' + 
+    tournaments.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+  
+  // Populate recent performances
+  const tbody = document.getElementById('prof-modal-recent-tbody');
+  const matches = loadMatches();
+  const playerMatches = matches.filter(m => 
+    m.innings && m.innings.some(inn => 
+      inn.batsmen && inn.batsmen.some(b => b.name === player.name)
+    )
+  ).slice(-5);
+  
+  if (playerMatches.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No recent performances</td></tr>';
+  } else {
+    tbody.innerHTML = playerMatches.map(m => `
+      <tr>
+        <td>${m.date}</td>
+        <td>${m.teamA} vs ${m.teamB}</td>
+        <td>--</td>
+        <td>--</td>
+      </tr>
+    `).join('');
+  }
+}
+
+// ============ ENHANCED TOURNAMENT DETAIL ============
+function enhanceTournamentDetail() {
+  if (!currentTournament) return;
+  
+  // Populate team select dropdowns
+  const teamOptions = currentTournament.teams.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+  
+  const teamASelect = document.getElementById('schedule-teamA-select');
+  const teamBSelect = document.getElementById('schedule-teamB-select');
+  
+  if (teamASelect) teamASelect.innerHTML = teamOptions;
+  if (teamBSelect) teamBSelect.innerHTML = teamOptions;
+}
+
+// ============ ENHANCED LIVE SCORER ============
+function enhanceLiveScorer() {
+  if (!currentMatch || !currentMatch.innings[0]) return;
+  
+  const inn = currentMatch.innings[0];
+  
+  // Populate striker select
+  const strikerSelect = document.getElementById('score-striker-select');
+  strikerSelect.innerHTML = inn.batsmen.map(b => 
+    `<option value="${b.name}" ${inn.strikerIdx === inn.batsmen.indexOf(b) ? 'selected' : ''}>${b.name}</option>`
+  ).join('');
+  
+  // Populate bowler select
+  const bowlerSelect = document.getElementById('score-bowler-select');
+  bowlerSelect.innerHTML = inn.bowlers.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+}
+
+// ============ ENHANCED WICKET MODAL ============
+function enhanceWicketModal() {
+  if (!currentMatch || !currentMatch.innings[0]) return;
+  
+  const inn = currentMatch.innings[0];
+  const batsmen = inn.batsmen.filter(b => !b.dismissed);
+  
+  const batsmanSelect = document.getElementById('wkt-batsman-out-select');
+  batsmanSelect.innerHTML = batsmen.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+  
+  const fielderSelect = document.getElementById('wkt-fielder-select');
+  fielderSelect.innerHTML = inn.bowlers.map(b => `<option value="${b.name}">${b.name}</option>`).join('');
+}
+
+// ============ ENHANCED DASHBOARD ============
+function enhanceDashboard() {
+  const tournaments = loadTournaments();
+  const players = loadPlayers();
+  const matches = loadMatches();
+  
+  // Add animations to metric cards
+  document.querySelectorAll('.metric-card').forEach((card, index) => {
+    card.style.animationDelay = `${index * 0.1}s`;
+  });
+}
+
+// ============ ENHANCED INITIALIZATION ============
+document.addEventListener('DOMContentLoaded', () => {
+  lucide.createIcons();
+  loadAllData();
+  navigateTo('dashboard');
+  enhanceDashboard();
+});
+
+// ============ ENHANCED NAVIGATION ============
+const originalNavigateTo = navigateTo;
+function navigateTo(view) {
+  originalNavigateTo(view);
+  
+  if (view === 'tournament-detail') {
+    enhanceTournamentDetail();
+  } else if (view === 'scorer') {
+    enhanceLiveScorer();
+  } else if (view === 'dashboard') {
+    enhanceDashboard();
+  }
+}
