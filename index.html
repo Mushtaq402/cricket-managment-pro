@@ -7,8 +7,6 @@
   <link rel="stylesheet" href="cricket_management_pro.css">
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Three.js for 3D -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
@@ -61,7 +59,7 @@
       <section id="view-dashboard" class="view-section active-view">
         <div class="glass-card flex-space">
           <div>
-            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 6px;">Welcome to Cricket Management Pro</h1>
+            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 6px;">Welcome to KJCA Cricket Hub</h1>
             <p style="color: var(--text-secondary); font-size: 14px;">Track live scores, manage tournaments, view detailed player profiles and match action logs.</p>
           </div>
           <button class="btn btn-accent" onclick="navigateTo('scorer')">
@@ -362,12 +360,7 @@
             
             <!-- LIVE STREAM SECTION -->
             <div class="glass-card live-stream-container">
-              <div class="card-header-row">
-                <div class="card-title">🎥 Live Broadcast</div>
-                <button class="btn btn-secondary btn-sm" onclick="open3DFieldModal()">
-                  <i data-lucide="cube"></i> 3D Field
-                </button>
-              </div>
+              <div class="card-title">🎥 Live Broadcast</div>
               <div class="live-stream-wrapper">
                 <div class="video-container" id="live-stream-video">
                   <div class="broadcast-placeholder">
@@ -1045,32 +1038,6 @@
     </div>
   </div>
 
-  <!-- 3D Cricket Field Visualization Modal -->
-  <div id="modal-3d-field" class="overlay-modal">
-    <div class="modal-content-card" style="max-width: 900px; max-height: 85vh;">
-      <button class="modal-close-btn" onclick="closeModal('modal-3d-field')">
-        <i data-lucide="x"></i>
-      </button>
-      <div class="card-title" style="margin-bottom: 16px; font-size: 16px;">🎮 3D Cricket Field Visualization</div>
-      <div id="3d-field-container" style="width: 100%; height: 500px; background: linear-gradient(135deg, rgba(108, 93, 211, 0.1), rgba(255, 107, 107, 0.05)); border-radius: var(--radius-md); border: 1px solid var(--border-color); position: relative;">
-        <!-- Three.js 3D field will render here -->
-      </div>
-      <div style="margin-top: 16px; display: flex; gap: 8px;">
-        <button class="btn btn-secondary btn-sm" onclick="rotate3DField('left')">
-          <i data-lucide="rotate-ccw"></i> Rotate Left
-        </button>
-        <button class="btn btn-secondary btn-sm" onclick="rotate3DField('right')">
-          <i data-lucide="rotate-cw"></i> Rotate Right
-        </button>
-        <button class="btn btn-secondary btn-sm" onclick="zoom3DField('in')">
-          <i data-lucide="zoom-in"></i> Zoom In
-        </button>
-        <button class="btn btn-secondary btn-sm" onclick="zoom3DField('out')">
-          <i data-lucide="zoom-out"></i> Zoom Out
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- Script Loader -->
   <script src="cricket_management_pro.js"></script>
