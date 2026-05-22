@@ -396,6 +396,51 @@ html, body {
   overflow: hidden;
 }
 
+.video-container iframe,
+.video-container video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-score-overlay {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 28px);
+  max-width: 560px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-md);
+  background: rgba(6, 12, 28, 0.82);
+  color: #ffffff;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(10px);
+}
+
+.video-score-overlay span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.video-score-overlay strong {
+  flex: 0 0 auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  line-height: 1;
+}
+
 .broadcast-placeholder {
   display: flex;
   flex-direction: column;
@@ -448,6 +493,24 @@ html, body {
   align-items: flex-end;
 }
 
+.telecast-controls {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.8fr) minmax(180px, 1.2fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.telecast-destination {
+  padding: 10px 12px;
+  border: 1px solid rgba(108, 93, 211, 0.18);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
 .stream-url-input {
   flex: 1;
   padding: 10px 12px;
@@ -462,6 +525,86 @@ html, body {
   outline: none;
   border-color: var(--primary);
   background: rgba(108, 93, 211, 0.1);
+}
+
+/* ============================================
+   MOBILE APP DOWNLOAD
+   ============================================ */
+
+.mobile-download-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 24px;
+}
+
+.mobile-download-panel {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.mobile-app-mark {
+  width: 86px;
+  height: 86px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(108, 93, 211, 0.28), rgba(255, 107, 107, 0.16));
+  border: 1px solid rgba(108, 93, 211, 0.35);
+}
+
+.mobile-app-mark i {
+  width: 42px;
+  height: 42px;
+  color: var(--primary-light);
+}
+
+.download-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.download-actions a {
+  text-decoration: none;
+}
+
+.download-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .mobile-download-grid,
+  .mobile-download-panel {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .stream-controls,
+  .telecast-controls {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .video-score-overlay {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: calc(100% - 20px);
+    padding: 8px 10px;
+  }
+
+  .video-score-overlay strong {
+    font-size: 18px;
+  }
 }
 
 /* ============================================
@@ -1305,4 +1448,4 @@ tbody tr:last-child td {
     align-items: center;
     text-align: center;
   }
-}
+}

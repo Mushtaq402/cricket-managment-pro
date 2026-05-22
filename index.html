@@ -49,6 +49,12 @@
             <span>Match History</span>
           </a>
         </li>
+        <li class="nav-item" id="nav-mobile">
+          <a onclick="navigateTo('mobile')">
+            <i data-lucide="smartphone"></i>
+            <span>Mobile App</span>
+          </a>
+        </li>
       </ul>
     </aside>
 
@@ -79,6 +85,10 @@
           <div class="metric-card" onclick="navigateTo('history')">
             <span class="metric-card-label">Matches Scored</span>
             <span class="metric-card-value" id="dash-matches-count">0</span>
+          </div>
+          <div class="metric-card" onclick="navigateTo('mobile')">
+            <span class="metric-card-label">Mobile App</span>
+            <span class="metric-card-value">APK</span>
           </div>
         </div>
 
@@ -371,11 +381,29 @@
                       <span>LIVE</span>
                     </div>
                   </div>
+                  <div class="video-score-overlay" id="video-score-overlay">
+                    <span id="video-overlay-team">Scorecard Ready</span>
+                    <strong id="video-overlay-score">0/0</strong>
+                    <span id="video-overlay-overs">0.0 overs</span>
+                  </div>
                 </div>
                 <div class="stream-controls">
-                  <input type="text" id="stream-url-input" placeholder="Enter YouTube/RTMP URL..." class="stream-url-input">
+                  <input type="text" id="stream-url-input" placeholder="Enter YouTube/RTMP URL..." class="stream-url-input" oninput="updateTelecastDestination()">
                   <button class="btn btn-primary btn-sm" onclick="loadStreamURL()">Load Stream</button>
                   <button class="btn btn-secondary btn-sm" onclick="toggleSimulatedBroadcast()">Simulated Feed</button>
+                </div>
+                <div class="telecast-controls">
+                  <select id="telecast-platform-select" class="stream-url-input" onchange="updateTelecastDestination()">
+                    <option value="youtube">YouTube Live</option>
+                    <option value="facebook">Facebook Live</option>
+                    <option value="twitch">Twitch</option>
+                    <option value="custom">Custom RTMP</option>
+                  </select>
+                  <input type="text" id="telecast-stream-key" placeholder="Stream key / stream name" class="stream-url-input">
+                  <button class="btn btn-accent btn-sm" onclick="copyTelecastInfo()">Copy Telecast Info</button>
+                </div>
+                <div class="telecast-destination" id="telecast-destination">
+                  Select a platform to prepare RTMP telecast details.
                 </div>
               </div>
             </div>
@@ -764,6 +792,50 @@
 
         </div>
 
+      </section>
+
+      <!-- ==================== MOBILE APP DOWNLOAD ==================== -->
+      <section id="view-mobile" class="view-section">
+        <div class="glass-card flex-space">
+          <div>
+            <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 4px;">Mobile App</h1>
+            <p style="color: var(--text-secondary); font-size: 14px;">Install the Android scoring companion app for live scores, video preview, and telecast setup.</p>
+          </div>
+          <button class="btn btn-accent" onclick="downloadMobileApp()">
+            <i data-lucide="download"></i> Download Android APK
+          </button>
+        </div>
+
+        <div class="mobile-download-grid">
+          <div class="glass-card mobile-download-panel">
+            <div class="mobile-app-mark">
+              <i data-lucide="smartphone"></i>
+            </div>
+            <div>
+              <div class="card-title">Cricket Management Pro Mobile</div>
+              <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.7; margin-bottom: 16px;">
+                Built with Expo for Android. The app includes quick score controls, a stream preview player, live score video overlay, and RTMP telecast destination details.
+              </p>
+              <div class="download-actions">
+                <button class="btn btn-primary" onclick="downloadMobileApp()">
+                  <i data-lucide="download-cloud"></i> Download APK
+                </button>
+                <a class="btn btn-secondary" href="mobile-app/README.md" target="_blank" rel="noopener">
+                  <i data-lucide="book-open"></i> Setup Guide
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card">
+            <div class="card-title">Build Status</div>
+            <div class="download-status-list">
+              <div><span class="cap-badge cap-orange">Ready</span> Mobile source code is in <strong>mobile-app/</strong></div>
+              <div><span class="cap-badge cap-orange">Ready</span> Android production export has been verified</div>
+              <div><span class="cap-badge">Pending</span> Place the final APK at <strong>downloads/cricket-management-pro.apk</strong></div>
+            </div>
+          </div>
+        </div>
       </section>
 
     </main>

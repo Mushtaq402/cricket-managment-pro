@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Cricket Management Pro",
+    "slug": "cricket-management-pro",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cricketmanagementpro.mobile"
+    },
+    "android": {
+      "package": "com.cricketmanagementpro.mobile",
+      "permissions": [
+        "INTERNET"
+      ]
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
